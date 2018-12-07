@@ -32,13 +32,23 @@ function generateShoppingItemsString(shoppingList) {
   return items.join("");
 }
 
+function filterOutCheckedItems() {
+  let newSTORE = [];
+  if ($('.js-shoppinglist-check-toggle').is(":checked")) {
+  console.log("toggle checked");
+    newSTORE = STORE.filter( (item) => item.checked === true);
+    return newSTORE;
+  } else {
+    console.log("toggle not checked")
+    return STORE;
+  }
+
+}
 
 function renderShoppingList() {
   // render the shopping list in the DOM
-  console.log('`renderShoppingList` ran');
-  const shoppingListItemsString = generateShoppingItemsString(STORE);
-
-  // insert that HTML into the DOM
+  console.log('renderShoppingList ran');
+  let shoppingListItemsString = generateShoppingItemsString(filterOutCheckedItems());
   $('.js-shopping-list').html(shoppingListItemsString);
 }
 
@@ -76,22 +86,21 @@ function handleItemCheckClicked() {
   $('.js-shopping-list').on('click', `.js-item-toggle`, event => {
     console.log('`handleItemCheckClicked` ran');
     const itemIndex = getItemIndexFromElement(event.currentTarget);
-    STORE.splice(itemIndex, 1);
+    toggleCheckedForListItem(itemIndex);
     renderShoppingList();
   });
 }
 
 
 function handleDeleteItemClicked() {
-  $('.js-shopping-list').on('click', `shopping-item-delete`, event => {
-    console.log('`handleItemCheckClicked` ran');
+  $('.js-shopping-list').on('click', `.shopping-item-delete`, event => {
     const itemIndex = getItemIndexFromElement(event.currentTarget);
-    toggleCheckedForListItem(itemIndex);
+    STORE.splice(itemIndex, 1);
     renderShoppingList();
   });
   // this function will be responsible for when users want to delete a shopping list
   // item
-  console.log('`handleDeleteItemClicked` ran')
+  console.log('handleDeleteItemClicked ran')
 }
 
 // this function will be our callback when the page loads. it's responsible for
@@ -100,6 +109,7 @@ function handleDeleteItemClicked() {
 // for individual shopping list items.
 function handleShoppingList() {
   renderShoppingList();
+  filterOutCheckedItems(); 
   handleNewItemSubmit();
   handleItemCheckClicked();
   handleDeleteItemClicked();
