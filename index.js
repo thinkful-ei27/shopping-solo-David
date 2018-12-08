@@ -38,11 +38,15 @@ function generateItemElement(item, itemIndex, template) {
       <span class="shopping-item js-shopping-item ${item.checked ? "shopping-item__checked" : ''}">${item.name}</span>
       <div class="shopping-item-controls">
         <button class="shopping-item-toggle js-item-toggle">
-            <span class="button-label">check</span>
+            <span class="button-label">Check</span>
         </button>
         <button class="shopping-item-delete js-item-delete">
-            <span class="button-label">delete</span>
+            <span class="button-label">Delete</span>
         </button>
+        <button class="shopping-item-edit js-item-edit">
+          <span class ="button-label">Edit</span>
+          </button>
+          <input type="text" name="edit-text-box" class="js-edit-text-box" placeholder="Change the item!">
       </div>
     </li>`;
 }
@@ -129,11 +133,6 @@ function handleSubmit() {
   });
 }
 
-
-function handleSearchSumbit() {
-  
-}
-
 function toggleCheckedForListItem(itemIndex) {
   console.log("Toggling checked property for item at index " + itemIndex);
   STORE.items[itemIndex].checked = !STORE.items[itemIndex].checked;
@@ -156,6 +155,28 @@ function handleItemCheckClicked() {
   });
 }
 
+function changeItemName(itemIndex, inputVal) {
+  for (let i =0; i < STORE.items.length; i++) {
+    if (STORE.items[i].id === itemIndex) {
+      console.log('store item change name is: ' + STORE.items[i].id);
+      STORE.items[i+1]['name'] = inputVal;
+
+    }
+  }
+}
+function handleEditItemClicked() {
+  let inputVal = "";
+  $('.js-shopping-list').on('keyup', '.js-edit-text-box', function() {
+    inputVal = $(this).closest('.js-edit-text-box').val();
+  })
+  $('.js-shopping-list').on('click', `.js-item-edit`, event => {
+    console.log('handleItemCheckClicked ran');
+    const itemIndex = getItemIndexFromElement(event.currentTarget);
+    changeItemName(itemIndex, inputVal)
+    renderShoppingList();
+  });
+}
+
 
 function handleDeleteItemClicked() {
   $('.js-shopping-list').on('click', `.shopping-item-delete`, event => {
@@ -172,6 +193,7 @@ function handleShoppingList() {
   handleSubmit();
   handleItemCheckClicked();
   handleDeleteItemClicked();
+  handleEditItemClicked()
 }
 
 $(handleShoppingList);
