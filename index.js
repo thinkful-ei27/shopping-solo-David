@@ -54,9 +54,7 @@ function generateItemElement(item, itemIndex, template) {
 
 function generateShoppingItemsString(shoppingList) {
   console.log("Generating shopping list element");
-
   const items = shoppingList.map((item, index) => generateItemElement(item, index));
-  
   return items.join("");
 }
 
@@ -75,22 +73,14 @@ function filterBySearchValAndCheck() {
 function handleCheckSelect() {
   $('.js-shoppinglist-check-toggle').on('click',( event => {
     let switchVal = $('.js-shoppinglist-check-toggle').prop('checked');
-    if (switchVal) {
-      STORE['checkFilter'] = true;
-    } else {
-      STORE['checkFilter'] = false;
-    } 
+    STORE['checkFilter'] = switchVal;
     console.log('checkSwitch ' + switchVal)
     renderShoppingList();
   }));
 }
 
 function checkSwitch(bool) {
-  if (bool) {
-    STORE['checkFilter'] = true;
-  } else {
-    STORE['checkFilter'] = false;
-  }
+    STORE['checkFilter'] = bool;
 }
 
 function renderShoppingList() {
@@ -156,14 +146,9 @@ function handleItemCheckClicked() {
 }
 
 function changeItemName(itemIndex, inputVal) {
-  for (let i =0; i < STORE.items.length; i++) {
-    if (STORE.items[i].id === itemIndex) {
-      console.log('store item change name is: ' + STORE.items[i].id);
-      STORE.items[i+1]['name'] = inputVal;
-
-    }
-  }
+      STORE.items[itemIndex]['name'] = inputVal;
 }
+
 function handleEditItemClicked() {
   let inputVal = "";
   $('.js-shopping-list').on('keyup', '.js-edit-text-box', function() {
