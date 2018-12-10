@@ -1,6 +1,7 @@
 'use strict';
 
 const STORE = {
+  counter: 5,
   items: [
   {
     id: 1,
@@ -34,7 +35,7 @@ const STORE = {
 
 function generateItemElement(item, itemIndex, template) {
   return `
-    <li class="js-item-index-element" data-item-index="${itemIndex}">
+    <li class="js-item-index-element" data-item-index="${itemIndex}" data-item-id="${item.id}">
       <span class="shopping-item js-shopping-item ${item.checked ? "shopping-item__checked" : ''}">${item.name}</span>
       <div class="shopping-item-controls">
         <button class="shopping-item-toggle js-item-toggle">
@@ -103,7 +104,7 @@ function renderShoppingList() {
 
 function addItemToShoppingList(itemName) {
   console.log(`Adding "${itemName}" to shopping list`);
-  if (itemName !== '') STORE.items.push({name: itemName, checked: false});
+  if (itemName !== '') STORE.items.push({name: itemName, checked: false, id: STORE.counter++});
 }
 
 function filterShoppingList(itemName) {
@@ -123,9 +124,10 @@ function handleSubmit() {
   });
 }
 
-function toggleCheckedForListItem(itemIndex) {
-  console.log("Toggling checked property for item at index " + itemIndex);
-  STORE.items[itemIndex].checked = !STORE.items[itemIndex].checked;
+function toggleCheckedForListItem(id) {
+  console.log("Toggling checked property for item at index " + id);
+  const item = findStoreID(id);
+  item.checked = !item.checked;
 }
 
 
@@ -136,27 +138,34 @@ function getItemIndexFromElement(item) {
   return parseInt(itemIndexString, 10);
 }
 
+function getItemIdFromElement(item) {
+  const itemIndexString = $(item)
+    .closest('.js-item-index-element')
+    .attr('data-item-id');
+  return parseInt(itemIndexString, 10);
+}
+
 function handleItemCheckClicked() {
   $('.js-shopping-list').on('click', `.js-item-toggle`, event => {
     console.log('handleItemCheckClicked ran');
-    const itemIndex = getItemIndexFromElement(event.currentTarget);
-    toggleCheckedForListItem(itemIndex);
+    const itemId = getItemIdFromElement(event.currentTarget);
+    toggleCheckedForListItem(itemId);
     renderShoppingList();
   });
 }
-
-function changeItemName(itemIndex, inputVal) {
-      STORE.items[itemIndex]['name'] = inputVal;
+function findStoreID(id){
+  return STORE.items.find( item=> item.id === id);
+}
+function changeItemName(id, inputVal) {
+      const item = findStoreID(id);
+      item['name'] = inputVal;
 }
 
 function handleEditItemClicked() {
-  let inputVal = "";
-  $('.js-shopping-list').on('keyup', '.js-edit-text-box', function() {
-    inputVal = $(this).closest('.js-edit-text-box').val();
-  })
   $('.js-shopping-list').on('click', `.js-item-edit`, event => {
+    const inputVal = $(event.currentTarget.parentElement).find("input").val()
     console.log('handleItemCheckClicked ran');
-    const itemIndex = getItemIndexFromElement(event.currentTarget);
+    const itemIndex = getItemIdFromElement(event.currentTarget);
     changeItemName(itemIndex, inputVal)
     renderShoppingList();
   });
@@ -165,8 +174,12 @@ function handleEditItemClicked() {
 
 function handleDeleteItemClicked() {
   $('.js-shopping-list').on('click', `.shopping-item-delete`, event => {
-    const itemIndex = getItemIndexFromElement(event.currentTarget);
-    STORE.items.splice(itemIndex, 1);
+    const itemId = getItemIdFromElement(event.currentTarget);
+  
+    STORE.items = STORE.items.filter( item => { 
+      return item.id !== itemId
+    });
+
     renderShoppingList();
   });
   console.log('handleDeleteItemClicked ran')
